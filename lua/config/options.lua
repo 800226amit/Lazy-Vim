@@ -1,0 +1,12 @@
+local o = vim.opt
+o.number = true
+o.relativenumber = true
+o.clipboard = 'unnamedplus'
+o.mouse = 'a'
+o.expandtab = true
+o.shiftwidth = 2
+o.tabstop = 2
+o.smartindent = true
+o.wrap = false
+o.scrolloff = 8
+o.signcolumn = 'yes'
