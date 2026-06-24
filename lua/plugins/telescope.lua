@@ -15,6 +15,10 @@ return {
       },
       "nvim-telescope/telescope-ui-select.nvim",
       "nvim-tree/nvim-web-devicons",
+      {
+        "nvim-telescope/telescope-file-browser.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+      },
     },
     config = function()
       local telescope = require("telescope")
@@ -91,6 +95,7 @@ return {
       -- Load extensions
       telescope.load_extension("fzf")
       telescope.load_extension("ui-select")
+      telescope.load_extension("file_browser")
     end
   },
 

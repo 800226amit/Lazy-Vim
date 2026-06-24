@@ -25,6 +25,7 @@ require("lazy").setup({
   { import = "plugins.git" },
   { import = "plugins.editor" },
   { import = "plugins.coding" },
+  { import = "plugins.harpoon" },
 }, {
   -- Lazy.nvim settings
   ui = {

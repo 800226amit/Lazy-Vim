@@ -41,7 +41,37 @@ opt.scrolloff = 8
 opt.updatetime = 50
 opt.timeoutlen = 300
 opt.mouse = "a"
-opt.clipboard = "unnamedplus"
+
+-- Cross-platform clipboard
+-- Linux: needs xclip/xsel/wl-clipboard  |  Mac: auto (pbcopy)
+-- Windows WSL: uses clip.exe + powershell  |  SSH: uses OSC52
+if vim.fn.has("wsl") == 1 then
+  -- Windows WSL clipboard via clip.exe
+  vim.g.clipboard = {
+    name  = "WslClipboard",
+    copy  = { ["+"] = "clip.exe",  ["*"] = "clip.exe" },
+    paste = {
+      ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+      ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+    },
+    cache_enabled = 0,
+  }
+elseif os.getenv("SSH_TTY") ~= nil and vim.fn.has("unix") == 1 then
+  -- SSH remote: use OSC52 (works in most modern terminals: iTerm2, Windows Terminal, etc.)
+  vim.g.clipboard = {
+    name  = "OSC52",
+    copy  = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+else
+  opt.clipboard = "unnamedplus"
+end
 
 -- Folding (better with Treesitter)
 opt.foldmethod = "expr"

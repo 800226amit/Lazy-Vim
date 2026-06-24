@@ -48,10 +48,15 @@ map("n", "<leader>8", "<cmd>BufferLineGoToBuffer 8<CR>", { desc = "Buffer 8" })
 map("n", "<leader>9", "<cmd>BufferLineGoToBuffer 9<CR>", { desc = "Buffer 9" })
 
 -- Move lines
-map("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down" })
-map("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up" })
-map("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
-map("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+map("n", "<A-j>", ":m .+1<CR>==",        { desc = "Move line down" })
+map("n", "<A-k>", ":m .-2<CR>==",        { desc = "Move line up" })
+map("v", "<A-j>", ":m '>+1<CR>gv=gv",   { desc = "Move selection down" })
+map("v", "<A-k>", ":m '<-2<CR>gv=gv",   { desc = "Move selection up" })
+
+-- Duplicate line (like VS Code Shift+Alt+Down)
+map("n", "<A-S-j>", "yyp",              { desc = "Duplicate line down" })
+map("n", "<A-S-k>", "yyP",              { desc = "Duplicate line up" })
+map("v", "<A-S-j>", "y'>p",            { desc = "Duplicate selection down" })
 
 -- Better indenting
 map("v", "<", "<gv", { desc = "Indent left" })
@@ -80,18 +85,39 @@ map("n", "<C-y>", "<C-r>",    { desc = "Redo" })
 map("i", "<C-y>", "<C-o><C-r>", { desc = "Redo" })
 
 -- File explorer
-map("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
-map("n", "<C-b>", ":NvimTreeToggle<CR>", { desc = "Toggle sidebar" })
+map("n", "<leader>e",  ":NvimTreeToggle<CR>",   { desc = "Toggle file explorer" })
+map("n", "<C-b>",      ":NvimTreeToggle<CR>",   { desc = "Toggle sidebar" })
+-- Reveal current file in explorer (like VS Code's "Reveal in Explorer")
+map("n", "<leader>ef", ":NvimTreeFindFile<CR>", { desc = "Reveal file in explorer" })
 
 -- Telescope
-map("n", "<C-p>", ":Telescope find_files<CR>", { desc = "Find files" })
-map("n", "<C-f>", ":Telescope live_grep<CR>", { desc = "Find in files" })
-map("n", "<leader>fb", ":Telescope buffers<CR>", { desc = "Find buffers" })
-map("n", "<leader>fr", ":Telescope oldfiles<CR>", { desc = "Recent files" })
-map("n", "<leader>fc", ":Telescope commands<CR>", { desc = "Commands" })
-map("n", "<leader>fh", ":Telescope help_tags<CR>", { desc = "Help tags" })
-map("n", "<leader>fp", ":Telescope projects<CR>", { desc = "Projects" })
-map("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find files" })
+map("n", "<C-p>",      ":Telescope find_files<CR>",  { desc = "Find files" })
+map("n", "<C-f>",      ":Telescope live_grep<CR>",   { desc = "Find in files" })
+map("n", "<leader>fb", ":Telescope buffers<CR>",     { desc = "Find buffers" })
+map("n", "<leader>fr", ":Telescope oldfiles<CR>",    { desc = "Recent files" })
+map("n", "<leader>fc", ":Telescope commands<CR>",    { desc = "Commands" })
+map("n", "<leader>fh", ":Telescope help_tags<CR>",   { desc = "Help tags" })
+map("n", "<leader>fp", ":Telescope projects<CR>",    { desc = "Projects" })
+map("n", "<leader>ff", ":Telescope find_files<CR>",  { desc = "Find files" })
+-- Search inside a specific directory (type path, then search)
+map("n", "<leader>fd", function()
+  require("telescope.builtin").find_files({
+    cwd = vim.fn.input("Directory: ", vim.fn.expand("%:p:h") .. "/", "dir"),
+  })
+end, { desc = "Find files in directory" })
+-- Search text inside a specific directory
+map("n", "<leader>fg", function()
+  require("telescope.builtin").live_grep({
+    search_dirs = { vim.fn.input("Directory: ", vim.fn.expand("%:p:h") .. "/", "dir") },
+  })
+end, { desc = "Grep in directory" })
+-- Browse files like a file manager (telescope-file-browser)
+map("n", "<leader>fe", function()
+  require("telescope").extensions.file_browser.file_browser({
+    path = vim.fn.expand("%:p:h"),
+    select_buffer = true,
+  })
+end, { desc = "Browse files (file browser)" })
 
 
 -- LSP navigation (Telescope-powered for better UI)

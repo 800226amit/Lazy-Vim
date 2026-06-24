@@ -28,11 +28,40 @@ return {
     end
   },
 
-  -- Status line
+  -- Navic: shows current function/class in statusbar (breadcrumb)
+  {
+    "SmiteshP/nvim-navic",
+    dependencies = { "neovim/nvim-lspconfig" },
+    config = function()
+      require("nvim-navic").setup({
+        icons = {
+          File          = "󰈙 ", Module        = " ", Namespace = "󰌗 ",
+          Package       = " ", Class         = "󰌗 ", Method    = "󰆧 ",
+          Property      = " ", Field         = " ", Constructor = " ",
+          Enum          = "󰕘 ", Interface    = "󰕘 ", Function   = "󰊕 ",
+          Variable      = "󰆧 ", Constant     = "󰏿 ", String     = "󰀬 ",
+          Number        = "󰎠 ", Boolean      = "◩ ",  Array      = "󰅪 ",
+          Object        = "󰅩 ", Key          = "󰌋 ",  Null       = "󰟢 ",
+          EnumMember    = " ", Struct        = "󰌗 ", Event      = " ",
+          Operator      = "󰆕 ", TypeParameter = "󰊄 ",
+        },
+        lsp = { auto_attach = true },
+        highlight = true,
+        separator = "  ",
+        depth_limit = 5,
+      })
+    end,
+  },
+
+  -- Status line (with navic breadcrumb)
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+      "SmiteshP/nvim-navic",
+    },
     config = function()
+      local navic = require("nvim-navic")
       require("lualine").setup({
         options = {
           theme = "catppuccin",
@@ -43,10 +72,17 @@ return {
         sections = {
           lualine_a = { "mode" },
           lualine_b = { "branch", "diff", "diagnostics" },
-          lualine_c = { "filename" },
+          lualine_c = {
+            "filename",
+            {
+              function() return navic.get_location() end,
+              cond = function() return navic.is_available() end,
+              color = { fg = "#7aa2f7" },
+            },
+          },
           lualine_x = { "encoding", "fileformat", "filetype" },
           lualine_y = { "progress" },
-          lualine_z = { "location" }
+          lualine_z = { "location" },
         },
       })
     end

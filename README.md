@@ -1,875 +1,503 @@
-# 🚀 Ultimate Neovim Configuration - Complete Guide
+# Ultimate Neovim Config — Complete Shortcut Guide
 
-**Simple, Beautiful, Powerful** - Your VS Code replacement!
-
----
-
-## 📋 Table of Contents
-
-1. [Basic Navigation](#-basic-navigation)
-2. [File Operations](#-file-operations)
-3. [File Explorer](#-file-explorer-nvimtree)
-4. [Finding Files (Telescope)](#-finding-files-telescope)
-5. [Editing](#-editing)
-6. [LSP & Coding](#-lsp--coding)
-7. [Git Integration](#-git-integration)
-8. [Terminal](#-terminal)
-9. [Window Management](#-window-management)
-10. [Buffer Management](#-buffer-management)
-11. [Special Features](#-special-features)
+**Leader key = `Space`**  `jk` ya `jj` se Insert mode se bahar nikalein
 
 ---
 
-## 🎯 Basic Navigation
+## Platform Support
 
-### Moving Around
-| Key | Action |
-|-----|--------|
-| `h` `j` `k` `l` | Move left, down, up, right |
-| `w` | Jump to next word |
-| `b` | Jump to previous word |
-| `0` | Go to start of line |
-| `$` | Go to end of line |
-| `gg` | Go to first line |
-| `G` | Go to last line |
-| `Ctrl+u` | Scroll up half page |
-| `Ctrl+d` | Scroll down half page |
-| `{` | Jump to previous paragraph |
-| `}` | Jump to next paragraph |
+| Platform | Status | Notes |
+|----------|--------|-------|
+| **Linux** | Full | `sudo apt install ripgrep fd-find xclip` |
+| **Mac** | Full | `brew install ripgrep fd lazygit neovim` — clipboard auto (pbcopy) |
+| **Windows WSL** | Full | clipboard auto-config via `clip.exe` |
+| **Windows Native** | Partial | telescope-fzf needs MSVC/MinGW; baki sab kaam karta |
+| **SSH Remote** | Full | clipboard via OSC52 (iTerm2 / Windows Terminal mein kaam karta) |
 
-### Modes
-| Key | Action |
-|-----|--------|
-| `i` | Insert mode (before cursor) |
-| `a` | Insert mode (after cursor) |
-| `I` | Insert at start of line |
-| `A` | Insert at end of line |
-| `o` | New line below |
-| `O` | New line above |
-| `v` | Visual mode (select) |
-| `V` | Visual line mode |
-| `Ctrl+v` | Visual block mode |
-| `Esc` or `jk` or `jj` | Exit to normal mode |
+### Mac pe kya install karein
+```bash
+brew install neovim ripgrep fd lazygit
+brew install --cask font-jetbrains-mono-nerd-font
+xcode-select --install   # telescope-fzf-native ke liye
+```
+
+### Windows WSL pe kya install karein
+```bash
+sudo apt install ripgrep fd-find xclip
+# clipboard WSL config auto-detect hoti hai (clip.exe use karta hai)
+```
+
+### SSH pe clipboard
+OSC52 protocol auto-use hota hai. Terminal mein enable karein:
+- **iTerm2**: Settings → General → Selection → Enable OSC52
+- **Windows Terminal**: Auto-supported
+- **tmux**: `set -s set-clipboard on` in `~/.tmux.conf`
 
 ---
 
-## 💾 File Operations
+## Text Select Karna, Delete Karna, Copy Karna
+
+### VS Code se compare karein
+
+| VS Code | Neovim | Kya karta hai |
+|---------|--------|--------------|
+| Click+Drag | `v` phir `h/l/j/k` | Characters select karo |
+| Ctrl+L (line) | `V` (Shift+V) | Puri line select karo |
+| Ctrl+D | `viw` | Ek word select karo |
+| Double-click word | `viw` | Word select (inner) |
+| Ctrl+Shift+K (delete line) | `dd` | Line delete karo |
+| Ctrl+X (cut line) | `dd` (clipboard se jaata hai) | Line cut karo |
+| Backspace | `x` | Ek character delete karo |
+| Ctrl+Backspace | `diw` | Ek word delete karo |
+| Ctrl+Shift+D (duplicate) | `Alt+Shift+J` | Line duplicate karo |
+
+### Character (ek ek letter)
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+s` | **Save file** |
-| `Ctrl+q` | Quit |
-| `:w` | Save (command mode) |
-| `:q` | Quit (command mode) |
-| `:wq` | Save and quit |
-| `:q!` | Quit without saving |
+| `v` | Visual mode shuru karo — phir arrows se select badao |
+| `x` | Cursor pe character delete karo |
+| `r` + letter | Cursor pe character replace karo |
+| `~` | Cursor pe letter ka case badlo (upper → lower) |
+
+### Word (ek shabd)
+
+| Key | Action |
+|-----|--------|
+| `viw` | Inner word select (spaces nahi) |
+| `vaw` | Around word select (spaces sahit) |
+| `yiw` | Word copy (yank) |
+| `diw` | Word delete |
+| `ciw` | Word change (delete + insert mode) |
+| `dw` | Word se aage tak delete karo |
+
+### Line (puri line)
+
+| Key | Action |
+|-----|--------|
+| `V` (Shift+V) | Puri line select karo |
+| `yy` | Puri line copy karo |
+| `dd` | Puri line delete karo |
+| `cc` ya `S` | Puri line change karo (delete + insert) |
+| `D` | Cursor se line end tak delete karo |
+| `C` | Cursor se line end tak change karo |
+
+### Multiple lines
+
+| Key | Action |
+|-----|--------|
+| `V` phir `j/k` | Multiple lines select karo |
+| `3yy` | 3 lines copy karo |
+| `3dd` | 3 lines delete karo |
+| `Ctrl+d` | Next matching word select (multi-cursor) |
+
+### VS Code-style shortcuts (custom)
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+C` | Copy (visual mode) |
+| `Ctrl+X` | Cut (visual mode) |
+| `Ctrl+V` | Paste (normal/insert mode) |
+| `Ctrl+Z` | Undo |
+| `Ctrl+Y` | Redo |
+| `Ctrl+A` | Select all |
+| `Alt+J` | Line neeche move karo |
+| `Alt+K` | Line upar move karo |
+| `Alt+Shift+J` | Line duplicate karo (neeche) |
+| `Alt+Shift+K` | Line duplicate karo (upar) |
 
 ---
 
-## 📁 File Explorer (NvimTree)
+## File Explorer (NvimTree)
 
-### Opening & Closing
+### Open/Close
+
 | Key | Action |
 |-----|--------|
-| `Ctrl+b` | **Toggle file explorer** |
-| `Space+e` | **Toggle file explorer** |
+| `Ctrl+B` | File explorer toggle karo |
+| `Space+e` | File explorer toggle karo |
+| `Space+ef` | **Current file ko explorer mein dikhao** (VS Code "Reveal in Explorer") |
 
-### Inside File Explorer
-| Key | Action | Description |
-|-----|--------|-------------|
-| `Enter` | Open file/folder | Opens file in editor OR expands folder |
-| `l` | Open file/folder | Alternative to Enter |
-| `h` | Close folder | Collapse expanded folder |
-| `o` | Open file | Open file (keep focus on tree) |
-| `a` | Create new file | Type name + Enter |
-| `d` | Delete file | Confirm with 'y' |
-| `r` | Rename file | Type new name + Enter |
-| `x` | Cut file | |
-| `c` | Copy file | |
-| `p` | Paste file | |
-| `y` | Copy filename | |
-| `Y` | Copy relative path | |
-| `gy` | Copy absolute path | |
-| `R` | Refresh tree | |
-| `H` | Toggle hidden files | Show/hide dotfiles |
-| `Ctrl+k` | Show file info | |
-| `q` | Close file explorer | |
-| `?` | Show help | All shortcuts |
+### Explorer aur File ke beech jaana
 
-### **🔥 How to Switch Between Explorer & File**
+```
+EDITOR ──→ EXPLORER:  Ctrl+H  (left window)
+EXPLORER ──→ EDITOR:  Ctrl+L  (right window)
+```
 
-1. **From Explorer to File:**
-   - Press `Enter` on a file
-   - OR press `l` on a file
-   - File opens and cursor moves to it
+Ya simple tarika:
+- `Space+ef` → current file explorer mein show ho jaata hai
+- File pe Enter dabao → file open, cursor editor mein
+- `Ctrl+H` / `Ctrl+L` se switch karo
 
-2. **From File to Explorer:**
-   - Press `Ctrl+b` or `Space+e`
-   - OR press `Ctrl+h` (move to left window)
+### Explorer ke andar shortcuts
 
-3. **Quick Navigation:**
-   ```
-   Ctrl+h - Move to LEFT window (File Explorer)
-   Ctrl+l - Move to RIGHT window (Your Code)
-   Ctrl+j - Move to BOTTOM window
-   Ctrl+k - Move to TOP window
-   ```
+| Key | Action |
+|-----|--------|
+| `Enter` ya `l` | File open / folder expand karo |
+| `h` | Folder collapse karo |
+| `a` | Naya file/folder banao (naam type karo) |
+| `d` | Delete karo |
+| `r` | Rename karo |
+| `x` | Cut karo |
+| `c` | Copy karo |
+| `p` | Paste karo |
+| `y` | File naam copy karo |
+| `Y` | Relative path copy karo |
+| `gy` | Full path copy karo |
+| `R` | Tree refresh karo |
+| `H` | Hidden files dikhao/chhupao |
+| `q` | Explorer band karo |
+| `?` | Saari shortcuts dikhao |
 
 ---
 
-## 🔍 Finding Files (Telescope)
+## File Dhundna (Telescope)
 
-### Main Shortcuts
-| Key | Action | Description |
-|-----|--------|-------------|
-| `Ctrl+p` | **Find files** | Quick file search (like VS Code) |
-| `Ctrl+f` | **Find text** | Search inside files (grep) |
-| `Space+fb` | Find buffers | Search open files |
-| `Space+fr` | Recent files | Previously opened files |
-| `Space+fc` | Commands | Search all commands |
-| `Space+fh` | Help tags | Search help |
-| `Space+fp` | Projects | Switch projects |
+### Files dhundna
 
-### Inside Telescope Window
 | Key | Action |
 |-----|--------|
-| `Ctrl+j` or `Down` | Next item |
-| `Ctrl+k` or `Up` | Previous item |
-| `Enter` | Open file |
-| `Ctrl+x` | Open in horizontal split |
-| `Ctrl+v` | Open in vertical split |
-| `Ctrl+t` | Open in new tab |
-| `Esc` | Close telescope |
-| `Ctrl+q` | Send to quickfix list |
+| `Ctrl+P` | Files dhundo (poore project mein) |
+| `Space+ff` | Files dhundo |
+| `Space+fr` | Recently opened files |
+| `Space+fb` | Open buffers (tabs) |
+| `Space+fe` | **File browser** (folder tree, directory navigate karo) |
+| `Space+fd` | **Kisi specific directory mein files dhundo** |
+| `Space+fg` | **Kisi specific directory mein text dhundo** |
+
+### Text dhundna
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+F` | Poore project mein text dhundo (live grep) |
+| `Space+fg` | Directory choose kar ke text dhundo |
+
+### Telescope ke andar shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+J` ya Down | Next item |
+| `Ctrl+K` ya Up | Previous item |
+| `Enter` | File open karo |
+| `Ctrl+V` | Vertical split mein open karo |
+| `Ctrl+X` | Horizontal split mein open karo |
+| `Esc` | Telescope band karo |
 
 ---
 
-## ✏️ Editing
+## Code Navigation (VS Code Ctrl+Click jaisa)
 
-### Basic Editing
 | Key | Action |
 |-----|--------|
-| `x` | Delete character |
-| `dd` | Delete line |
-| `yy` | Copy line |
-| `p` | Paste after |
-| `P` | Paste before |
-| `u` | **Undo** |
-| `Ctrl+r` | **Redo** |
-| `Ctrl+z` | Undo (custom) |
-| `Ctrl+y` | Redo (custom) |
-| `.` | Repeat last command |
+| `Ctrl+Click` | **Go to Definition** (mouse click) |
+| `gd` | **Go to Definition** (keyboard) |
+| `gr` | **Find all References** — method/variable kahan kahan use ho raha hai |
+| `gi` | Go to Implementation |
+| `gt` | Go to Type Definition |
+| `K` | Documentation popup dikhao (hover) |
+| `[d` | Previous error/warning |
+| `]d` | Next error/warning |
+| `Space+d` | Current line ki diagnostic dikhao |
 
-### Smart Editing
-| Key | Action | Description |
-|-----|--------|-------------|
-| `Ctrl+a` | **Select all** | |
-| `Ctrl+d` | **Multi-cursor** | Select next occurrence (VS Code style) |
-| `Alt+j` | Move line down | |
-| `Alt+k` | Move line up | |
-| `>` | Indent right | (visual mode) |
-| `<` | Indent left | (visual mode) |
-| `Tab` | Indent right | (visual mode) |
-| `Shift+Tab` | Indent left | (visual mode) |
+### LSP shortcuts
 
-### Comments
 | Key | Action |
 |-----|--------|
-| `gcc` | Toggle comment line |
-| `gc` | Toggle comment (visual mode) |
-| `Ctrl+/` | Toggle comment |
-
-### Surround
-| Key | Action | Example |
-|-----|--------|---------|
-| `ys{motion}{char}` | Add surround | `ysiw"` → surround word with " |
-| `ds{char}` | Delete surround | `ds"` → remove " around word |
-| `cs{old}{new}` | Change surround | `cs"'` → change " to ' |
-
-### Auto-pairs
-- Automatically closes: `()`, `[]`, `{}`, `""`, `''`, `<>`
+| `Space+lr` | References list (Telescope mein) |
+| `Space+ls` | File ke saare symbols (functions, classes) |
+| `Space+lw` | Poore project ke symbols dhundo |
+| `Space+la` | **Code outline** (Aerial — sidebar mein function tree) |
+| `Space+rn` ya `F2` | **Rename** (live preview ke saath) |
+| `Space+ca` | Code action (quick fix, import, etc.) |
+| `Space+lf` | **Format code** |
 
 ---
 
-## 🔧 LSP & Coding
+## Harpoon — Instant File Jump (Mouse-free)
 
-### Code Navigation
-| Key | Action | Description |
-|-----|--------|-------------|
-| `gd` | Go to definition | Jump to where function/variable is defined |
-| `gr` | Go to references | Show all places using this |
-| `gi` | Go to implementation | |
-| `gt` | Go to type definition | |
-| `K` | Hover docs | Show documentation |
-| `[d` | Previous diagnostic | Previous error/warning |
-| `]d` | Next diagnostic | Next error/warning |
+Files pin karo, instantly unpe jaao bina kuch dhunde.
 
-### Code Actions
 | Key | Action |
 |-----|--------|
-| `Space+rn` | **Rename** |
-| `F2` | **Rename** (alternative) |
-| `Space+ca` | **Code action** |
-| `Space+f` | **Format code** |
-| `Space+d` | Show diagnostic |
+| `Space+ha` | **Current file mark karo** (pin karo) |
+| `Space+hm` | Harpoon quick menu (marked files list) |
+| `Space+hh` | Telescope mein harpoon list |
+| `Ctrl+1` | Pehli marked file pe jaao |
+| `Ctrl+2` | Doosri marked file pe jaao |
+| `Ctrl+3` | Teesri marked file pe jaao |
+| `Ctrl+4` | Chauthi marked file pe jaao |
 
-### Auto-completion (in Insert mode)
-| Key | Action |
-|-----|--------|
-| `Ctrl+Space` | Trigger completion |
-| `Tab` | Next suggestion |
-| `Shift+Tab` | Previous suggestion |
-| `Enter` | Confirm selection |
-| `Ctrl+e` | Close completion |
-| `Ctrl+b` | Scroll docs up |
-| `Ctrl+f` | Scroll docs down |
+**Workflow**: `Space+ha` se 4 files mark karo, phir `Ctrl+1/2/3/4` se instantly switch karo.
 
 ---
 
-## 🔀 Git Integration
+## Code Outline — Aerial
 
-### Git Operations
+Function/class tree keyboard se navigate karo.
+
 | Key | Action |
 |-----|--------|
-| `Space+gg` | **Open LazyGit** |
-| `Space+gb` | Git blame line |
-| `Space+gp` | Preview hunk |
-| `Space+gr` | Reset hunk |
-| `Space+gs` | Stage hunk |
+| `Space+ao` | Aerial outline toggle karo |
+| `Space+an` | Next function/class pe jaao |
+| `Space+ap` | Previous function/class pe jaao |
+| `Space+la` | Telescope mein aerial symbols search karo |
+
+---
+
+## Search & Replace — Project-Wide (Spectre)
+
+| Key | Action |
+|-----|--------|
+| `Space+sr` | Spectre open karo (poore project mein replace) |
+| `Space+sw` | Word under cursor replace karo (project-wide) |
+| `Space+sf` | Sirf current file mein search/replace |
+
+---
+
+## Git
+
+| Key | Action |
+|-----|--------|
+| `Space+gg` | **LazyGit** (full git UI) |
+| `Space+gd` | **Git diff** (side-by-side) |
+| `Space+gh` | Current file ki git history |
+| `Space+gH` | Poore project ki git history |
+| `Space+gc` | Diff view band karo |
+| `Space+gb` | Line ka git blame dikhao |
+| `Space+gp` | Hunk preview |
+| `Space+gs` | Hunk stage karo |
+| `Space+gr` | Hunk reset karo |
 | `]c` | Next git change |
 | `[c` | Previous git change |
 
-### Inside LazyGit
+---
+
+## Buffers (Open Files / Tabs)
+
 | Key | Action |
 |-----|--------|
-| `Space` | Stage/unstage |
-| `c` | Commit |
-| `P` | Push |
-| `p` | Pull |
-| `Enter` | View details |
-| `q` | Quit |
+| `Tab` | Next buffer |
+| `Shift+Tab` | Previous buffer |
+| `Space+1` — `Space+9` | **Buffer number se seedha jaao** (tab bar ke number se) |
+| `Space+x` | Current buffer band karo |
+| `Space+X` | Sab buffer band karo (current chhod ke) |
+| `Space+fb` | Buffer list (Telescope mein) |
 
 ---
 
-## 🖥️ Terminal
+## Window Management
+
+### Split karo
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+\` | **Toggle terminal** |
-| `Esc` | Exit terminal mode |
+| `Space+sv` | Vertical split |
+| `Space+sh` | Horizontal split |
+| `Space+se` | Splits barabar karo |
+| `Space+sx` | Split band karo |
 
-**In terminal:**
-- Type commands normally
-- Press `Esc` to go back to normal mode
-- Press `i` to type again
+### Windows ke beech navigate karo
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+H` | Left window |
+| `Ctrl+L` | Right window |
+| `Ctrl+J` | Neeche wala window |
+| `Ctrl+K` | Upar wala window |
+
+### Resize karo
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+Up` | Height kam karo |
+| `Ctrl+Down` | Height badao |
+| `Ctrl+Left` | Width kam karo |
+| `Ctrl+Right` | Width badao |
 
 ---
 
-## 🪟 Window Management
+## Terminal
 
-### Split Windows
 | Key | Action |
 |-----|--------|
-| `Space+sv` | Split vertical |
-| `Space+sh` | Split horizontal |
-| `Space+se` | Make splits equal |
-| `Space+sx` | Close split |
-
-### Navigate Windows
-| Key | Action |
-|-----|--------|
-| `Ctrl+h` | Move to left window |
-| `Ctrl+j` | Move to bottom window |
-| `Ctrl+k` | Move to top window |
-| `Ctrl+l` | Move to right window |
-
-### Resize Windows
-| Key | Action |
-|-----|--------|
-| `Ctrl+Up` | Decrease height |
-| `Ctrl+Down` | Increase height |
-| `Ctrl+Left` | Decrease width |
-| `Ctrl+Right` | Increase width |
+| `Ctrl+\` | Terminal toggle karo (floating) |
+| `Esc` | Terminal se normal mode |
+| `i` | Terminal mein wapas type karo |
 
 ---
 
-## 📑 Buffer Management
-
-Buffers = Open files in memory
+## Search (File ke andar)
 
 | Key | Action |
 |-----|--------|
-| `Tab` | **Next buffer** |
-| `Shift+Tab` | **Previous buffer** |
-| `Space+x` | Close current buffer |
-| `Space+X` | Close all but current |
-| `Space+fb` | Find buffers |
-
----
-
-## 🌟 Special Features
-
-### Zen Mode
-| Key | Action |
-|-----|--------|
-| `Space+z` | Toggle Zen Mode (distraction-free) |
-
-### Undo Tree
-| Key | Action |
-|-----|--------|
-| `Space+u` | Toggle undo tree (visual undo history) |
-
-### Diagnostics (Errors/Warnings)
-| Key | Action |
-|-----|--------|
-| `Space+xx` | Toggle diagnostics panel |
-| `Space+xd` | Buffer diagnostics only |
-
-### Session Management
-| Key | Action |
-|-----|--------|
-| `Space+ss` | Restore last session |
-| `Space+sl` | Restore previous session |
-
-### Search
-| Key | Action |
-|-----|--------|
-| `/text` | Search forward |
-| `?text` | Search backward |
+| `/text` | Aage dhundo |
+| `?text` | Peeche dhundo |
 | `n` | Next match |
 | `N` | Previous match |
-| `Esc` | Clear search highlight |
+| `Esc` | Search highlight hatao |
+| `*` | Word under cursor dhundo (aage) |
+| `#` | Word under cursor dhundo (peeche) |
 
-### Markdown Preview
+---
+
+## Comments, Indent, Surround
+
 | Key | Action |
 |-----|--------|
-| `Space+mp` | Open markdown preview |
+| `Ctrl+/` | Line comment toggle |
+| `gcc` | Line comment toggle |
+| `gc` | Selection comment toggle (visual mode) |
+| `>` | Right indent (visual mode) |
+| `<` | Left indent (visual mode) |
+| `Tab` | Right indent (visual mode) |
+| `ys{motion}{char}` | Surround add karo (`ysiw"` → word ke around `"`) |
+| `ds{char}` | Surround hatao (`ds"` → `"` hata do) |
+| `cs{old}{new}` | Surround badlo (`cs"'` → `"` ko `'` se badlo) |
 
 ---
 
-## 🎓 Learning Tips
+## Jump / Flash Navigation
 
-### For Beginners:
-
-1. **Start with these essentials:**
-   ```
-   Ctrl+s     - Save
-   Ctrl+p     - Find files
-   Ctrl+b     - File explorer
-   Ctrl+\     - Terminal
-   jk         - Exit insert mode
-   ```
-
-2. **Basic workflow:**
-   - Open Neovim: `nvim`
-   - Press `Ctrl+p` to find files
-   - Press `i` to edit
-   - Type your code
-   - Press `jk` to exit insert mode
-   - Press `Ctrl+s` to save
-
-3. **File Explorer workflow:**
-   ```
-   1. Press Ctrl+b (open explorer)
-   2. Use j/k to move up/down
-   3. Press Enter to open file
-   4. Press Ctrl+l to focus on file
-   5. Press Ctrl+h to go back to explorer
-   ```
-
-### Practice These Daily:
-
-**Week 1:** Basic movement (`h j k l`), insert mode (`i`), save (`Ctrl+s`)
-**Week 2:** File navigation (`Ctrl+p`), buffers (`Tab`/`Shift+Tab`)
-**Week 3:** Visual mode (`v`), copy/paste (`yy`/`p`), undo/redo
-**Week 4:** LSP features (`gd`, `gr`, `Space+rn`)
+| Key | Action |
+|-----|--------|
+| `s` | Flash jump — 2 characters type karo, kisi bhi jagah jump karo |
+| `S` | Flash treesitter — code structure se jump karo |
 
 ---
 
-## 🆘 Help Commands
+## Completion (Insert Mode)
 
-| Command | Description |
-|---------|-------------|
-| `:help` | Open help |
+| Key | Action |
+|-----|--------|
+| `Ctrl+Space` | Completion trigger karo |
+| `Tab` | Next suggestion |
+| `Shift+Tab` | Previous suggestion |
+| `Enter` | Suggestion confirm karo |
+| `Ctrl+E` | Completion band karo |
+
+---
+
+## Diagnostics / Errors
+
+| Key | Action |
+|-----|--------|
+| `Space+xx` | Errors panel toggle karo |
+| `Space+xd` | Current file errors panel |
+| `[d` | Previous error |
+| `]d` | Next error |
+| `Space+d` | Error popup (current line) |
+| `Space+q` | Error list (quickfix) |
+
+---
+
+## Undo Tree, Sessions, Zen
+
+| Key | Action |
+|-----|--------|
+| `Space+u` | Undo tree dikhao (visual undo history) |
+| `Space+ss` | Session restore karo |
+| `Space+sl` | Last session restore karo |
+| `Space+z` | Zen mode (distraction-free) |
+| `Space+mp` | Markdown preview |
+
+---
+
+## File Operations
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+S` | Save |
+| `Ctrl+S` (insert) | Save (insert mode mein bhi) |
+| `Ctrl+Q` | Quit |
+| `:wq` | Save aur quit |
+| `:q!` | Bina save ke quit |
+
+---
+
+## Modes Quick Reference
+
+| Key | Mode |
+|-----|------|
+| `i` | Insert (cursor ke pehle) |
+| `a` | Insert (cursor ke baad) |
+| `I` | Insert (line ke shuru) |
+| `A` | Insert (line ke ant) |
+| `o` | Insert (neeche nai line) |
+| `O` | Insert (upar nai line) |
+| `v` | Visual (character) |
+| `V` | Visual (line) |
+| `Ctrl+V` | Visual (block/column) |
+| `jk` ya `jj` | Insert → Normal |
+| `Esc` | Kisi bhi mode → Normal |
+
+---
+
+## Kya Linux/Mac/Windows pe kaam karta hai
+
+| Feature | Linux | Mac | WSL | Windows Native | SSH |
+|---------|-------|-----|-----|----------------|-----|
+| Clipboard | ✅ xclip | ✅ pbcopy | ✅ clip.exe | ✅ native | ✅ OSC52 |
+| LazyGit | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Telescope fzf | ✅ | ✅ | ✅ | ⚠️ needs make | ✅ |
+| LuaSnip jsregexp | ✅ | ✅ | ✅ | ⚠️ needs MinGW | ✅ |
+| Markdown Preview | ✅ | ✅ | ✅ | ✅ | ❌ browser needed |
+| Terminal (ToggleTerm) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Mouse support | ✅ | ✅ | ✅ | ✅ | ⚠️ terminal-dependent |
+| Fonts (Nerd Fonts) | ✅ | ✅ | ✅ | ✅ | ⚠️ terminal pe set karein |
+
+### Windows Native — Kya nahi kaam karta
+- `telescope-fzf-native`: build ke liye `make` chahiye → `winget install GnuWin32.Make`
+- Shell-based tools (jo Linux commands use karte hain) nahi chalenge
+- Workaround: **WSL use karo** — sab kuch perfectly kaam karta hai
+
+### Mac — Sab kaam karta hai, bas install karo
+```bash
+brew install neovim ripgrep fd lazygit
+xcode-select --install
+```
+
+---
+
+## Which-Key — Shortcuts bhool gaye?
+
+`Space` dabao aur ruko — saari available shortcuts ka popup aayega!
+
+---
+
+## Help Commands
+
+| Command | Kya karta hai |
+|---------|---------------|
 | `:Lazy` | Plugin manager |
-| `:Mason` | LSP installer |
-| `:checkhealth` | Check Neovim health |
-| `:Telescope commands` | Search all commands |
+| `:Lazy sync` | Plugins update karo |
+| `:Mason` | LSP server install/manage karo |
+| `:checkhealth` | Neovim health check |
+| `:LspInfo` | LSP status dekho |
+| `:Telescope keymaps` | Saari shortcuts search karo |
+| `:ConformInfo` | Formatter status |
 
 ---
 
-## 🎯 Quick Reference Card
-
-### Most Used (Remember These!)
-
-```
-FILE OPERATIONS:
-Ctrl+s     - Save
-Ctrl+p     - Find files
-Ctrl+f     - Search in files
-Ctrl+b     - Toggle file explorer
-
-EDITING:
-i          - Insert mode
-jk/jj      - Normal mode
-Ctrl+z     - Undo
-Ctrl+d     - Multi-cursor
-gcc        - Comment line
-
-NAVIGATION:
-Ctrl+h/j/k/l  - Switch windows
-Tab           - Next buffer
-gd            - Go to definition
-Space+ca      - Code actions
-
-GIT:
-Space+gg   - LazyGit
-]c / [c    - Next/Prev change
-
-SPECIAL:
-Ctrl+\     - Terminal
-Space+z    - Zen mode
-Space+xx   - Show errors
-```
-
----
-
-## 🎨 Customization
-
-### Change Theme
-Edit `lua/plugins/ui.lua`:
-```lua
-flavour = "mocha"  -- Options: latte, frappe, macchiato, mocha
-```
-
-### Add More Keybindings
-Edit `lua/core/keymaps.lua`:
-```lua
-map("n", "your_key", "your_command", { desc = "Description" })
-```
-
-### Install More Language Servers
-```
-:Mason
-```
-Then press `i` to install servers
-
----
-
-## 🐛 Troubleshooting
-
-**Plugins not loading?**
-```
-:Lazy sync
-```
-
-**LSP not working?**
-```
-:Mason
-:LspInfo
-```
-
-**Errors on startup?**
-```
-:checkhealth
-```
-
----
-
-## 📝 File Structure
+## File Structure
 
 ```
 ~/.config/nvim/
-├── init.lua                 # Main entry point
-├── lua/
-│   ├── core/
-│   │   ├── options.lua     # Editor settings
-│   │   ├── keymaps.lua     # All keybindings
-│   │   └── autocmds.lua    # Auto commands
-│   └── plugins/
-│       ├── lazy-setup.lua  # Plugin manager
-│       ├── lsp.lua         # Language servers
-│       ├── completion.lua  # Auto-complete
-│       ├── treesitter.lua  # Syntax highlight
-│       ├── ui.lua          # Theme & UI
-│       ├── telescope.lua   # File finder
-│       ├── git.lua         # Git integration
-│       ├── editor.lua      # Editor tools
-│       └── coding.lua      # Coding tools
+├── init.lua
+└── lua/
+    ├── core/
+    │   ├── options.lua      # Editor settings (clipboard, tabs, etc.)
+    │   ├── keymaps.lua      # Saare shortcuts
+    │   └── autocmds.lua     # Auto commands
+    └── plugins/
+        ├── lazy-setup.lua   # Plugin manager
+        ├── lsp.lua          # Language servers
+        ├── completion.lua   # Auto-complete
+        ├── treesitter.lua   # Syntax highlight
+        ├── ui.lua           # Theme, lualine, which-key, noice
+        ├── telescope.lua    # File finder + file browser
+        ├── git.lua          # Git (gitsigns, lazygit, diffview)
+        ├── editor.lua       # Aerial, Spectre, inc-rename, autotag
+        ├── coding.lua       # autopairs, surround, formatter
+        └── harpoon.lua      # Harpoon 2 — instant file jump
 ```
-
----
-
-## 💡 Pro Tips
-
-1. **Use Telescope for everything:** `Ctrl+p` is your friend!
-2. **Learn LSP shortcuts:** `gd`, `gr`, `Space+rn` will save hours
-3. **Master window switching:** `Ctrl+h/j/k/l` for productivity
-4. **Use multi-cursor:** `Ctrl+d` like VS Code
-5. **Git integration:** `Space+gg` for visual git operations
-6. **Zen mode:** `Space+z` when you need focus
-
----
-
-## 🚀 You're Ready!
-
-Start with the basics, practice daily, and gradually learn more shortcuts.
-
-**Remember:** You don't need to memorize everything! Use:
-- `Space` then wait → see available shortcuts (which-key)
-- `:Telescope keymaps` → search all shortcuts
-
-Happy Coding! 🎉
-
-
-
-
-# The Ultimate Neovim Features Guide: Transform Your Coding Experience
-
-*A comprehensive guide to supercharge your Neovim setup with powerful features and plugins*
-
-## Table of Contents
-
-- [Current Features in Your Setup](#current-features-in-your-setup)
-- [Essential Development Features](#essential-development-features)
-- [Advanced Code Intelligence](#advanced-code-intelligence)
-- [UI/UX Enhancements](#uiux-enhancements)
-- [File Management & Navigation](#file-management--navigation)
-- [Git Integration](#git-integration)
-- [Testing & Debugging](#testing--debugging)
-- [Language-Specific Features](#language-specific-features)
-- [Productivity Boosters](#productivity-boosters)
-- [Theme & Appearance](#theme--appearance)
-- [Terminal & System Integration](#terminal--system-integration)
-- [Advanced Editing Features](#advanced-editing-features)
-- [Project Management](#project-management)
-- [Performance & Optimization](#performance--optimization)
-- [Documentation & Notes](#documentation--notes)
-
----
-
-## Current Features in Your Setup ✅
-
-### Core Features Already Configured:
-- **LSP (Language Server Protocol)** - Code intelligence for Java, JS/TS, HTML, CSS, C++
-- **Auto-completion (nvim-cmp)** - Smart code suggestions
-- **Syntax Highlighting (Treesitter)** - Advanced code coloring
-- **File Explorer (nvim-tree)** - Project file browser
-- **Fuzzy Finder (Telescope)** - Quick file/text search
-- **Terminal Integration (ToggleTerm)** - Built-in terminal
-- **Auto-pairs** - Automatic bracket/quote completion
-- **Comment Toggling** - Easy code commenting
-- **Git Signs** - Git change indicators
-- **Trouble** - Error/warning display
-- **Familiar Keybindings** - Ctrl+S, Ctrl+A, Ctrl+C, Ctrl+V
-
----
-
-## Essential Development Features 🚀
-
-### Code Formatting & Linting
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Auto-formatting** | `conform.nvim` | Format code on save for all languages | ⭐⭐⭐ |
-| **Linting** | `nvim-lint` | Real-time code quality checks | ⭐⭐⭐ |
-| **Prettier Integration** | `prettier.nvim` | JavaScript/TypeScript formatting | ⭐⭐⭐ |
-| **ESLint Integration** | Via LSP | JavaScript linting rules | ⭐⭐⭐ |
-
-### Code Refactoring
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Advanced Refactoring** | `refactoring.nvim` | Extract functions, variables, etc. | ⭐⭐⭐ |
-| **Multiple Cursors** | `vim-multiple-cursors` | Edit multiple locations simultaneously | ⭐⭐⭐ |
-| **Smart Rename** | Built into LSP | Rename variables across entire project | ⭐⭐⭐ |
-
----
-
-## Advanced Code Intelligence 🧠
-
-### Enhanced LSP Features
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **LSP Saga** | `lspsaga.nvim` | Beautiful LSP UI with breadcrumbs | ⭐⭐⭐ |
-| **Symbol Outline** | `symbols-outline.nvim` | Code structure sidebar | ⭐⭐ |
-| **Code Lens** | Built into LSP | Inline code information | ⭐⭐ |
-| **Inlay Hints** | Built into LSP | Parameter names and types | ⭐⭐ |
-
-### AI-Powered Features
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **GitHub Copilot** | `copilot.vim` | AI code completion | ⭐⭐⭐ |
-| **ChatGPT Integration** | `ChatGPT.nvim` | AI assistance within editor | ⭐⭐ |
-| **Code Explanation** | `explain-it.nvim` | AI explains complex code | ⭐⭐ |
-
----
-
-## UI/UX Enhancements 🎨
-
-### Advanced UI Components
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Dashboard** | `dashboard-nvim` | Beautiful startup screen | ⭐⭐⭐ |
-| **Winbar** | `barbecue.nvim` | Breadcrumb navigation | ⭐⭐⭐ |
-| **Smooth Scrolling** | `neoscroll.nvim` | Animated scrolling | ⭐⭐ |
-| **Color Highlighting** | `nvim-colorizer.lua` | Show colors in CSS/HTML | ⭐⭐⭐ |
-| **Indent Guides** | `indent-blankline.nvim` | Visual indentation lines | ⭐⭐⭐ |
-| **Minimap** | `minimap.vim` | Code minimap sidebar | ⭐⭐ |
-| **Zen Mode** | `zen-mode.nvim` | Distraction-free writing | ⭐⭐ |
-
-### Notification & Feedback
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Notifications** | `nvim-notify` | Beautiful notification system | ⭐⭐⭐ |
-| **Progress Indicators** | `fidget.nvim` | LSP progress in statusline | ⭐⭐ |
-| **Which Key** | `which-key.nvim` | Show available keybindings | ⭐⭐⭐ |
-
----
-
-## File Management & Navigation 📁
-
-### Advanced File Operations
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **File Browser** | `oil.nvim` | Edit filesystem like a buffer | ⭐⭐⭐ |
-| **Quick File Creation** | `nvim-tree` extensions | Quickly create files/folders | ⭐⭐ |
-| **Recent Files** | `telescope` extensions | Quick access to recent files | ⭐⭐⭐ |
-| **Session Management** | `auto-session` | Save/restore editor sessions | ⭐⭐ |
-
-### Enhanced Navigation
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Jump to Definition** | `telescope-lsp` | Enhanced LSP navigation | ⭐⭐⭐ |
-| **Bookmark System** | `vim-bookmarks` | Set and jump to bookmarks | ⭐⭐ |
-| **Buffer Navigation** | `bufferline.nvim` | Tab-like buffer management | ⭐⭐⭐ |
-| **Window Management** | `winshift.nvim` | Easy window rearrangement | ⭐⭐ |
-
----
-
-## Git Integration 📝
-
-### Advanced Git Features
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Git UI** | `lazygit.nvim` | Full-featured Git interface | ⭐⭐⭐ |
-| **Diff View** | `diffview.nvim` | Side-by-side diff comparison | ⭐⭐⭐ |
-| **Git Blame** | `git-blame.nvim` | Inline blame annotations | ⭐⭐ |
-| **Merge Conflicts** | `git-conflict.nvim` | Resolve conflicts easily | ⭐⭐⭐ |
-| **Commit Browser** | `telescope-git` | Browse commits and branches | ⭐⭐ |
-
----
-
-## Testing & Debugging 🐛
-
-### Testing Framework
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Test Runner** | `neotest` | Run and manage tests | ⭐⭐⭐ |
-| **Test Coverage** | `coverage.nvim` | Show test coverage | ⭐⭐ |
-| **Jest Integration** | `neotest-jest` | JavaScript testing | ⭐⭐⭐ |
-
-### Debugging Tools
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Debug Adapter** | `nvim-dap` | Full debugging support | ⭐⭐⭐ |
-| **Debug UI** | `nvim-dap-ui` | Visual debugging interface | ⭐⭐⭐ |
-| **Java Debugging** | `nvim-jdtls` | Java-specific debugging | ⭐⭐ |
-| **JavaScript Debugging** | `nvim-dap-vscode-js` | JS/TS debugging | ⭐⭐⭐ |
-
----
-
-## Language-Specific Features 💻
-
-### Web Development
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Live Server** | `live-server.nvim` | Live preview for web files | ⭐⭐⭐ |
-| **Emmet** | `emmet-vim` | HTML/CSS abbreviations | ⭐⭐⭐ |
-| **Tailwind Tools** | `tailwindcss-colorizer-cmp` | Tailwind color preview | ⭐⭐⭐ |
-| **React Snippets** | `vim-react-snippets` | React code templates | ⭐⭐⭐ |
-| **Package.json** | `package-info.nvim` | NPM package version info | ⭐⭐ |
-
-### Java Development
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Java Extensions** | `nvim-jdtls` | Advanced Java support | ⭐⭐⭐ |
-| **Maven Integration** | Built-in | Maven project support | ⭐⭐ |
-| **Spring Boot** | Extensions | Spring Boot development | ⭐⭐ |
-
-### Database Integration
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Database UI** | `vim-dadbod-ui` | Visual database browser | ⭐⭐ |
-| **SQL Completion** | `vim-dadbod-completion` | SQL auto-completion | ⭐⭐ |
-
----
-
-## Productivity Boosters ⚡
-
-### Automation & Shortcuts
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Snippet Engine** | `LuaSnip` | Custom code snippets | ⭐⭐⭐ |
-| **Auto Commands** | Built-in | Automated editor actions | ⭐⭐⭐ |
-| **Macro Recording** | Built-in | Record and replay actions | ⭐⭐ |
-| **Text Objects** | `nvim-surround` | Edit surrounding characters | ⭐⭐⭐ |
-
-### Search & Replace
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Advanced Search** | `telescope` | Multi-file search and replace | ⭐⭐⭐ |
-| **Regex Helper** | `vim-regex` | Visual regex building | ⭐⭐ |
-| **Find and Replace** | `nvim-spectre` | Project-wide find/replace | ⭐⭐⭐ |
-
----
-
-## Theme & Appearance 🎭
-
-### Color Schemes
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Theme Switcher** | `telescope-themes` | Quick theme switching | ⭐⭐ |
-| **Gruvbox Theme** | `gruvbox.nvim` | Popular dark theme | ⭐⭐ |
-| **Tokyo Night** | `tokyonight.nvim` | Modern colorscheme | ⭐⭐ |
-| **Nord Theme** | `nord.nvim` | Arctic-inspired theme | ⭐⭐ |
-
-### Visual Enhancements
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Transparent Background** | Theme configs | See-through editor | ⭐⭐ |
-| **Custom Highlights** | Built-in | Personalized syntax colors | ⭐⭐ |
-| **Font Icons** | `nvim-web-devicons` | File type icons everywhere | ⭐⭐⭐ |
-
----
-
-## Terminal & System Integration 🖥️
-
-### System Tools
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **System Clipboard** | Built-in | Seamless copy/paste | ⭐⭐⭐ |
-| **External Tools** | Various | Integration with system tools | ⭐⭐ |
-| **Shell Commands** | Built-in | Run shell commands in editor | ⭐⭐⭐ |
-
-### Remote Development
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **SSH Support** | Built-in | Edit files over SSH | ⭐⭐ |
-| **Docker Integration** | `nvim-docker` | Container development | ⭐⭐ |
-
----
-
-## Advanced Editing Features ✏️
-
-### Text Manipulation
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Advanced Motions** | `leap.nvim` | Fast cursor movement | ⭐⭐⭐ |
-| **Column Editing** | Built-in | Edit multiple columns | ⭐⭐ |
-| **Text Case Conversion** | `case.nvim` | Change text case easily | ⭐⭐ |
-| **Line Duplication** | Built-in | Duplicate lines/selections | ⭐⭐⭐ |
-
-### Code Folding
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Smart Folding** | `nvim-ufo` | Intelligent code folding | ⭐⭐ |
-| **Fold Indicators** | Built-in | Visual fold markers | ⭐⭐ |
-
----
-
-## Project Management 📋
-
-### Workspace Features
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Project Switching** | `project.nvim` | Quick project navigation | ⭐⭐⭐ |
-| **Task Runner** | `overseer.nvim` | Run build tasks and scripts | ⭐⭐⭐ |
-| **TODO Management** | `todo-comments.nvim` | Highlight and search TODOs | ⭐⭐⭐ |
-
----
-
-## Performance & Optimization ⚡
-
-### Speed Improvements
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Lazy Loading** | `lazy.nvim` | Load plugins on demand | ⭐⭐⭐ |
-| **Startup Time** | `startuptime.nvim` | Measure loading performance | ⭐⭐ |
-| **Memory Management** | Built-in configs | Optimize memory usage | ⭐⭐ |
-
----
-
-## Documentation & Notes 📚
-
-### Writing & Documentation
-| Feature | Plugin | Description | Priority |
-|---------|--------|-------------|----------|
-| **Markdown Preview** | `markdown-preview.nvim` | Live markdown preview | ⭐⭐⭐ |
-| **Note Taking** | `telekasten.nvim` | Zettelkasten-style notes | ⭐⭐ |
-| **Table Mode** | `vim-table-mode` | Easy table creation | ⭐⭐ |
-| **Spell Checking** | Built-in | Grammar and spelling | ⭐⭐ |
-
----
-
-## Implementation Priority Guide
-
-### 🔥 Must-Have (Implement First)
-1. **Code Formatting** (`conform.nvim`)
-2. **Dashboard** (`dashboard-nvim`)
-3. **Which Key** (`which-key.nvim`)
-4. **Buffer Line** (`bufferline.nvim`)
-5. **Git UI** (`lazygit.nvim`)
-6. **Indent Guides** (`indent-blankline.nvim`)
-7. **Color Highlighting** (`nvim-colorizer.lua`)
-
-### ⭐ High Priority (Implement Second)
-1. **GitHub Copilot** (`copilot.vim`)
-2. **Live Server** (`live-server.nvim`)
-3. **Emmet** (`emmet-vim`)
-4. **Debugging** (`nvim-dap` + `nvim-dap-ui`)
-5. **Testing** (`neotest`)
-6. **Advanced Motions** (`leap.nvim`)
-
-### 💡 Nice to Have (Implement Later)
-1. **Minimap** (`minimap.vim`)
-2. **Zen Mode** (`zen-mode.nvim`)
-3. **AI Chat** (`ChatGPT.nvim`)
-4. **Database UI** (`vim-dadbod-ui`)
-
----
-
-## Getting Started
-
-### Step 1: Choose Your Priorities
-Select 3-5 features from the "Must-Have" category to start with.
-
-### Step 2: Install Gradually
-Add one plugin at a time to avoid overwhelming your system.
-
-### Step 3: Learn the Shortcuts
-Each new feature comes with its own keybindings - take time to learn them.
-
-### Step 4: Customize
-Adjust settings to match your workflow and preferences.
-
----
-
-## Performance Considerations
-
-- **Plugin Count**: 30-50 plugins is typical for a full-featured setup
-- **Startup Time**: Should remain under 100ms with proper lazy loading
-- **Memory Usage**: Monitor with `:checkhealth` command
-- **Conflicts**: Test each plugin thoroughly before adding the next
-
----
-
-## Conclusion
-
-This guide provides over **100 potential features** you can add to your Neovim setup. Start with the essentials and gradually build your perfect development environment. Remember, the best configuration is one that matches your specific workflow and needs.
-
-Happy coding! 🚀
-
----
-
-*Last updated: August 2025*
-*Total Features Listed: 100+*
-*Difficulty Range: Beginner to Advanced*
