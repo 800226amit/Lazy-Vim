@@ -4,6 +4,24 @@
 
 ---
 
+## Shortcuts kaise dabate hain — Basic Rules
+
+| Likha hai | Matlab | Keyboard pe kya karo |
+|-----------|--------|----------------------|
+| `Ctrl+S` | Ctrl aur S | `Ctrl` dabo rakho → `s` dabao → chhhodo |
+| `Ctrl+V` (V capital) | Sirf Ctrl+v | Shift NAHI dabaana — V capital sirf padhne ke liye |
+| `Shift+V` | Shift aur V | `Shift` dabo rakho → `v` dabao |
+| `Shift+Tab` | Shift aur Tab | `Shift` dabo rakho → `Tab` dabao |
+| `Alt+J` | Alt aur j | `Alt` dabo rakho → `j` dabao |
+| `Alt+Shift+J` | Alt+Shift+j | `Alt` + `Shift` dono dabo rakho → `j` dabao |
+| `Space+gd` | Leader phir gd | `Space` chhhodo → `g` dabao → `d` dabao |
+
+> **Note**: `Ctrl+Shift+Letter` Linux terminal mein reliable nahi hota — isliye is config mein aisi shortcuts nahi hain.
+
+---
+
+---
+
 ## Platform Support
 
 | Platform | Status | Notes |
@@ -103,8 +121,8 @@ OSC52 protocol auto-use hota hai. Terminal mein enable karein:
 | `Ctrl+A` | Select all |
 | `Alt+J` | Line neeche move karo |
 | `Alt+K` | Line upar move karo |
-| `Alt+Shift+J` | Line duplicate karo (neeche) |
-| `Alt+Shift+K` | Line duplicate karo (upar) |
+| `Alt+Shift+J` | Line duplicate karo (neeche) — Alt dabo + Shift dabo + j dabao |
+| `Alt+Shift+K` | Line duplicate karo (upar)  — Alt dabo + Shift dabo + k dabao |
 
 ---
 
@@ -227,6 +245,8 @@ Files pin karo, instantly unpe jaao bina kuch dhunde.
 | `Ctrl+2` | Doosri marked file pe jaao |
 | `Ctrl+3` | Teesri marked file pe jaao |
 | `Ctrl+4` | Chauthi marked file pe jaao |
+| `Space+hp` | Harpoon list mein previous file |
+| `Space+hn` | Harpoon list mein next file |
 
 **Workflow**: `Space+ha` se 4 files mark karo, phir `Ctrl+1/2/3/4` se instantly switch karo.
 

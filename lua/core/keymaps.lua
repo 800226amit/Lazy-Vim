@@ -201,9 +201,9 @@ map("n", "<C-1>", function() require("harpoon"):list():select(1) end, { desc = "
 map("n", "<C-2>", function() require("harpoon"):list():select(2) end, { desc = "Harpoon file 2" })
 map("n", "<C-3>", function() require("harpoon"):list():select(3) end, { desc = "Harpoon file 3" })
 map("n", "<C-4>", function() require("harpoon"):list():select(4) end, { desc = "Harpoon file 4" })
--- Navigate inside harpoon list
-map("n", "<C-S-P>", function() require("harpoon"):list():prev() end, { desc = "Harpoon: prev" })
-map("n", "<C-S-N>", function() require("harpoon"):list():next() end, { desc = "Harpoon: next" })
+-- Harpoon prev/next (<C-S-P>/<C-S-N> terminals mein kaam nahi karte)
+map("n", "<leader>hp", function() require("harpoon"):list():prev() end, { desc = "Harpoon: prev file" })
+map("n", "<leader>hn", function() require("harpoon"):list():next() end, { desc = "Harpoon: next file" })
 
 -- ── Aerial (code outline) ──────────────────────────────────────────────────
 map("n", "<leader>ao", "<cmd>AerialToggle<CR>",  { desc = "Aerial: toggle outline" })
