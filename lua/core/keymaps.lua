@@ -31,10 +31,21 @@ map("n", "<leader>se", "<C-w>=", { desc = "Equal splits" })
 map("n", "<leader>sx", ":close<CR>", { desc = "Close split" })
 
 -- Buffer navigation
-map("n", "<Tab>", ":bnext<CR>", { desc = "Next buffer" })
+map("n", "<Tab>",   ":bnext<CR>",     { desc = "Next buffer" })
 map("n", "<S-Tab>", ":bprevious<CR>", { desc = "Previous buffer" })
-map("n", "<leader>x", ":bd<CR>", { desc = "Close buffer" })
-map("n", "<leader>X", ":%bd|e#|bd#<CR>", { desc = "Close all but current" })
+map("n", "<leader>x", ":bd<CR>",              { desc = "Close buffer" })
+map("n", "<leader>X", ":%bd|e#|bd#<CR>",      { desc = "Close all but current" })
+
+-- Jump to buffer by number (matches bufferline ordinal numbers)
+map("n", "<leader>1", "<cmd>BufferLineGoToBuffer 1<CR>", { desc = "Buffer 1" })
+map("n", "<leader>2", "<cmd>BufferLineGoToBuffer 2<CR>", { desc = "Buffer 2" })
+map("n", "<leader>3", "<cmd>BufferLineGoToBuffer 3<CR>", { desc = "Buffer 3" })
+map("n", "<leader>4", "<cmd>BufferLineGoToBuffer 4<CR>", { desc = "Buffer 4" })
+map("n", "<leader>5", "<cmd>BufferLineGoToBuffer 5<CR>", { desc = "Buffer 5" })
+map("n", "<leader>6", "<cmd>BufferLineGoToBuffer 6<CR>", { desc = "Buffer 6" })
+map("n", "<leader>7", "<cmd>BufferLineGoToBuffer 7<CR>", { desc = "Buffer 7" })
+map("n", "<leader>8", "<cmd>BufferLineGoToBuffer 8<CR>", { desc = "Buffer 8" })
+map("n", "<leader>9", "<cmd>BufferLineGoToBuffer 9<CR>", { desc = "Buffer 9" })
 
 -- Move lines
 map("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down" })
@@ -50,15 +61,23 @@ map("v", ">", ">gv", { desc = "Indent right" })
 map("v", "<Tab>", ">gv", { desc = "Indent right" })
 map("v", "<S-Tab>", "<gv", { desc = "Indent left" })
 
--- Better paste
+-- Better paste (visual mode - paste without overwriting clipboard)
 map("v", "p", '"_dP', { desc = "Paste without yanking" })
+
+-- VS Code-like copy/cut/paste
+map("v", "<C-c>", '"+y',  { desc = "Copy to system clipboard" })
+map("v", "<C-x>", '"+d',  { desc = "Cut to system clipboard" })
+map("n", "<C-v>", '"+p',  { desc = "Paste from system clipboard" })
+map("i", "<C-v>", "<C-r>+", { desc = "Paste from system clipboard" })
 
 -- Select all
 map("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 
--- Undo/Redo
-map("n", "<C-z>", "u", { desc = "Undo" })
-map("n", "<C-y>", "<C-r>", { desc = "Redo" })
+-- Undo/Redo (normal + insert mode)
+map("n", "<C-z>", "u",        { desc = "Undo" })
+map("i", "<C-z>", "<C-o>u",   { desc = "Undo" })
+map("n", "<C-y>", "<C-r>",    { desc = "Redo" })
+map("i", "<C-y>", "<C-o><C-r>", { desc = "Redo" })
 
 -- File explorer
 map("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
@@ -72,17 +91,32 @@ map("n", "<leader>fr", ":Telescope oldfiles<CR>", { desc = "Recent files" })
 map("n", "<leader>fc", ":Telescope commands<CR>", { desc = "Commands" })
 map("n", "<leader>fh", ":Telescope help_tags<CR>", { desc = "Help tags" })
 map("n", "<leader>fp", ":Telescope projects<CR>", { desc = "Projects" })
+map("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find files" })
 
--- LSP
-map("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
-map("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
-map("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
-map("n", "gt", vim.lsp.buf.type_definition, { desc = "Go to type definition" })
-map("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation" })
-map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
+
+-- LSP navigation (Telescope-powered for better UI)
+map("n", "gd", "<cmd>Telescope lsp_definitions<CR>",      { desc = "Go to definition" })
+map("n", "gr", "<cmd>Telescope lsp_references<CR>",       { desc = "Find all references" })
+map("n", "gi", "<cmd>Telescope lsp_implementations<CR>",  { desc = "Go to implementation" })
+map("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", { desc = "Go to type definition" })
+map("n", "K",  vim.lsp.buf.hover,                         { desc = "Hover documentation" })
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-map("n", "<F2>", vim.lsp.buf.rename, { desc = "Rename (F2)" })
-map("n", "<leader>f", function() require("conform").format() end, { desc = "Format code" })
+map("n", "<leader>lf", function() require("conform").format() end, { desc = "Format code" })
+
+-- Live-preview rename (inc-rename) — <F2> and <leader>rn
+map("n", "<leader>rn", function() return ":IncRename " .. vim.fn.expand("<cword>") end,
+  { expr = true, desc = "Rename symbol (live preview)" })
+map("n", "<F2>", function() return ":IncRename " .. vim.fn.expand("<cword>") end,
+  { expr = true, desc = "Rename (F2, live preview)" })
+
+-- LSP extra shortcuts
+map("n", "<leader>ls", "<cmd>Telescope lsp_document_symbols<CR>",    { desc = "Document symbols" })
+map("n", "<leader>lw", "<cmd>Telescope lsp_workspace_symbols<CR>",   { desc = "Workspace symbols" })
+map("n", "<leader>lr", "<cmd>Telescope lsp_references<CR>",          { desc = "References" })
+map("n", "<leader>la", "<cmd>Telescope aerial<CR>",                  { desc = "Code outline (aerial)" })
+
+-- Ctrl+Click → go to definition
+map("n", "<C-LeftMouse>", "<LeftMouse><cmd>Telescope lsp_definitions<CR>", { desc = "Go to definition (click)" })
 
 -- Diagnostics
 map("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
@@ -123,3 +157,45 @@ map("n", "<leader>sl", function() require("persistence").load({ last = true }) e
 
 -- Markdown preview
 map("n", "<leader>mp", ":MarkdownPreview<CR>", { desc = "Markdown preview" })
+
+-- ── Harpoon 2 ─────────────────────────────────────────────────────────────
+-- <leader>ha → mark current file
+-- <leader>hh → open harpoon list (pick with telescope)
+-- <C-1>..<C-4> → instantly jump to marked file 1-4
+map("n", "<leader>ha", function() require("harpoon"):list():add() end,
+  { desc = "Harpoon: mark file" })
+map("n", "<leader>hh", function()
+  _G._harpoon_telescope(require("harpoon"):list())
+end, { desc = "Harpoon: pick file (telescope)" })
+map("n", "<leader>hm", function()
+  local harpoon = require("harpoon")
+  harpoon.ui:toggle_quick_menu(harpoon:list())
+end, { desc = "Harpoon: quick menu" })
+map("n", "<C-1>", function() require("harpoon"):list():select(1) end, { desc = "Harpoon file 1" })
+map("n", "<C-2>", function() require("harpoon"):list():select(2) end, { desc = "Harpoon file 2" })
+map("n", "<C-3>", function() require("harpoon"):list():select(3) end, { desc = "Harpoon file 3" })
+map("n", "<C-4>", function() require("harpoon"):list():select(4) end, { desc = "Harpoon file 4" })
+-- Navigate inside harpoon list
+map("n", "<C-S-P>", function() require("harpoon"):list():prev() end, { desc = "Harpoon: prev" })
+map("n", "<C-S-N>", function() require("harpoon"):list():next() end, { desc = "Harpoon: next" })
+
+-- ── Aerial (code outline) ──────────────────────────────────────────────────
+map("n", "<leader>ao", "<cmd>AerialToggle<CR>",  { desc = "Aerial: toggle outline" })
+map("n", "<leader>an", "<cmd>AerialNext<CR>",    { desc = "Aerial: next symbol" })
+map("n", "<leader>ap", "<cmd>AerialPrev<CR>",    { desc = "Aerial: prev symbol" })
+
+-- ── Spectre (project-wide search & replace) ───────────────────────────────
+map("n", "<leader>sr",  function() require("spectre").open() end,
+  { desc = "Spectre: open search/replace" })
+map("n", "<leader>sw",  function() require("spectre").open_visual({ select_word = true }) end,
+  { desc = "Spectre: replace word under cursor" })
+map("v", "<leader>sw",  function() require("spectre").open_visual() end,
+  { desc = "Spectre: replace selection" })
+map("n", "<leader>sf",  function() require("spectre").open_file_search() end,
+  { desc = "Spectre: search in current file" })
+
+-- ── Diffview (git diff & history) ─────────────────────────────────────────
+map("n", "<leader>gd", "<cmd>DiffviewOpen<CR>",          { desc = "Git: open diff view" })
+map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", { desc = "Git: current file history" })
+map("n", "<leader>gH", "<cmd>DiffviewFileHistory<CR>",   { desc = "Git: project history" })
+map("n", "<leader>gc", "<cmd>DiffviewClose<CR>",         { desc = "Git: close diff view" })

@@ -94,6 +94,79 @@ return {
     end,
   },
 
+  -- Project-wide search & replace (Spectre)
+  {
+    "nvim-pack/nvim-spectre",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = "Spectre",
+    config = function()
+      require("spectre").setup({
+        open_cmd = "noswapfile vnew",
+        live_update = true,
+        highlight = {
+          ui      = "String",
+          search  = "DiffChange",
+          replace = "DiffDelete",
+        },
+      })
+    end,
+  },
+
+  -- Code outline / symbol tree (keyboard-navigable)
+  {
+    "stevearc/aerial.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("aerial").setup({
+        backends = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
+        layout = {
+          max_width        = { 40, 0.2 },
+          min_width        = 25,
+          default_direction = "right",
+          placement        = "edge",
+        },
+        show_guides = true,
+        attach_mode = "window",
+        filter_kind = {
+          "Class", "Constructor", "Enum", "Function",
+          "Interface", "Module", "Method", "Struct",
+        },
+        highlight_on_hover = true,
+        autojump = false,
+        open_automatic = false,
+      })
+      require("telescope").load_extension("aerial")
+    end,
+  },
+
+  -- Live-preview rename (replaces plain lsp rename)
+  {
+    "smjonas/inc-rename.nvim",
+    cmd = "IncRename",
+    config = function()
+      require("inc_rename").setup()
+    end,
+  },
+
+  -- Auto-close HTML/JSX tags
+  {
+    "windwp/nvim-ts-autotag",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      require("nvim-ts-autotag").setup({
+        opts = {
+          enable_close         = true,
+          enable_rename        = true,
+          enable_close_on_slash = true,
+        },
+      })
+    end,
+  },
+
   -- Highlight word under cursor
   {
     "RRethy/vim-illuminate",

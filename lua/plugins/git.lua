@@ -49,6 +49,30 @@ return {
     end
   },
 
+  -- Diffview - side-by-side diff & full file history
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = {
+      "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles",
+      "DiffviewFocusFiles", "DiffviewFileHistory",
+    },
+    config = function()
+      require("diffview").setup({
+        enhanced_diff_hl = true,
+        view = {
+          default = { layout = "diff2_horizontal" },
+          file_history = { layout = "diff2_horizontal" },
+        },
+        key_bindings = {
+          view = { q = "<cmd>DiffviewClose<CR>" },
+          file_panel = { q = "<cmd>DiffviewClose<CR>" },
+          file_history_panel = { q = "<cmd>DiffviewClose<CR>" },
+        },
+      })
+    end,
+  },
+
   -- LazyGit integration
   {
     "kdheepak/lazygit.nvim",

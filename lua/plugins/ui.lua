@@ -216,14 +216,76 @@ return {
     end,
   },
 
-  -- Smooth scrolling
+  -- Smooth scrolling (<C-b>/<C-f> removed — those keys used by NvimTree/Telescope)
   {
     "karb94/neoscroll.nvim",
     event = "VeryLazy",
     config = function()
       require("neoscroll").setup({
-        mappings = { "<C-u>", "<C-d>", "<C-b>", "<C-f>", "zt", "zz", "zb" },
+        mappings = { "<C-u>", "<C-d>", "zt", "zz", "zb" },
       })
     end
+  },
+
+  -- Better cmdline + notifications UI
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    config = function()
+      require("noice").setup({
+        cmdline = {
+          enabled = true,
+          view = "cmdline_popup",
+          format = {
+            cmdline   = { icon = ">" },
+            search_down = { icon = " " },
+            search_up   = { icon = " " },
+          },
+        },
+        messages  = { enabled = true },
+        popupmenu = { enabled = true, backend = "nui" },
+        lsp = {
+          override = {
+            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+            ["vim.lsp.util.stylize_markdown"] = true,
+            ["cmp.entry.get_documentation"] = true,
+          },
+          progress = { enabled = true },
+          hover    = { enabled = true },
+          signature = { enabled = true },
+        },
+        presets = {
+          bottom_search     = false,
+          command_palette   = true,
+          long_message_to_split = true,
+          lsp_doc_border    = true,
+        },
+      })
+    end,
+  },
+
+  -- Which-key with groups
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    config = function()
+      vim.o.timeout    = true
+      vim.o.timeoutlen = 300
+      local wk = require("which-key")
+      wk.setup({ plugins = { spelling = { enabled = true } } })
+      wk.register({
+        ["<leader>f"] = { name = " Find (Telescope)" },
+        ["<leader>g"] = { name = " Git" },
+        ["<leader>l"] = { name = " LSP / Format" },
+        ["<leader>h"] = { name = "󱡁 Harpoon" },
+        ["<leader>s"] = { name = " Splits / Sessions / Search" },
+        ["<leader>x"] = { name = " Diagnostics" },
+        ["<leader>a"] = { name = "󰙣 Aerial Outline" },
+      })
+    end,
   },
 }
