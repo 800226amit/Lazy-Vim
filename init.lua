@@ -10,6 +10,7 @@ vim.g.maplocalleader = " "
 require("core.options")
 require("core.keymaps")
 require("core.autocmds")
+require("core.templates")
 require("plugins.lazy-setup")
 
 -- Theme activation

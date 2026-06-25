@@ -68,19 +68,38 @@ return {
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp", priority = 1000 },
-          { name = "luasnip", priority = 750 },
-          { name = "buffer", priority = 500 },
-          { name = "path", priority = 250 },
+          { name = "luasnip",  priority = 750 },
+          { name = "crates",   priority = 900 },   -- Rust: Cargo.toml crate versions
+          { name = "npm",      priority = 900 },   -- JS: package.json npm packages
+          { name = "buffer",   priority = 500 },
+          { name = "path",     priority = 250 },
         }),
         formatting = {
           format = lspkind.cmp_format({
             mode = "symbol_text",
             maxwidth = 50,
             ellipsis_char = "...",
+            symbol_map = {
+              Codeium = "󰚩",   -- AI icon
+            },
             before = function(entry, vim_item)
+              -- Source label dikhao
+              local source_labels = {
+                nvim_lsp = "[LSP]",
+                luasnip  = "[Snip]",
+                buffer   = "[Buf]",
+                path     = "[Path]",
+                crates   = "[Crate]",
+                npm      = "[NPM]",
+                codeium  = "[AI]",
+              }
+              local label = source_labels[entry.source.name]
+              if label then
+                vim_item.menu = label
+              end
               return vim_item
-            end
-          })
+            end,
+          }),
         },
       })
 

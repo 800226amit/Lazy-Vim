@@ -97,4 +97,73 @@ return {
       })
     end,
   },
+
+  -- Rust: Cargo.toml mein crate versions dikhao + auto-suggest latest version
+  {
+    "saecki/crates.nvim",
+    event = { "BufRead Cargo.toml" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("crates").setup({
+        completion = {
+          cmp = { enabled = true },   -- nvim-cmp ke saath integrate
+        },
+        lsp = {
+          enabled = true,
+          actions = true,
+          completion = true,
+          hover = true,
+        },
+      })
+      -- Cargo.toml mein shortcuts
+      local map = vim.keymap.set
+      map("n", "<leader>cu", function() require("crates").upgrade_all_crates() end,
+        { desc = "Crates: upgrade all" })
+      map("n", "<leader>co", function() require("crates").show_popup() end,
+        { desc = "Crates: show versions" })
+      map("n", "<leader>cf", function() require("crates").show_features_popup() end,
+        { desc = "Crates: show features" })
+    end,
+  },
+
+  -- NPM: package.json mein package versions dikhao
+  {
+    "vuki656/package-info.nvim",
+    event = { "BufRead package.json" },
+    dependencies = { "MunifTanjim/nui.nvim" },
+    config = function()
+      require("package-info").setup({
+        colors = {
+          up_to_date = "#3C4048",
+          outdated   = "#d19a66",
+        },
+        icons = {
+          enable = true,
+          style  = { up_to_date = "|  ", outdated = "|  " },
+        },
+        autostart          = true,
+        hide_unstable_versions = true,
+        package_manager    = "npm",
+      })
+      local map = vim.keymap.set
+      map("n", "<leader>ns", function() require("package-info").show() end,
+        { desc = "NPM: show versions" })
+      map("n", "<leader>nu", function() require("package-info").update() end,
+        { desc = "NPM: update package" })
+      map("n", "<leader>ni", function() require("package-info").install() end,
+        { desc = "NPM: install package" })
+      map("n", "<leader>nd", function() require("package-info").delete() end,
+        { desc = "NPM: delete package" })
+    end,
+  },
+
+  -- NPM package names auto-complete in package.json
+  {
+    "David-Kunz/cmp-npm",
+    event = { "BufRead package.json" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("cmp-npm").setup({ ignore = {}, only_semantic_versions = false })
+    end,
+  },
 }

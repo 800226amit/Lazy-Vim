@@ -453,6 +453,124 @@ Function/class tree keyboard se navigate karo.
 
 ---
 
+## AI Code Completion — Codeium (FREE)
+
+Codeium ek free AI hai jo sabhi languages mein code suggest karta hai — GitHub Copilot jaisa but bilkul free.
+
+### Pehli baar setup (ek baar karna hai)
+```
+:Codeium Auth
+```
+Browser mein Google/GitHub account se login karo. Bas.
+
+### AI ke shortcuts (Insert mode mein)
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+G` | AI suggestion **accept** karo (puri) |
+| `Ctrl+W` | Ek word accept karo |
+| `Ctrl+L` | Ek line accept karo |
+| `Ctrl+N` | Next suggestion dikhao |
+| `Ctrl+P` | Previous suggestion dikhao |
+| `Ctrl+X` | Suggestion dismiss karo |
+
+> Ghost text (gray color) dikhta hai — `Ctrl+G` se accept karo.
+
+---
+
+## File Templates — Naya File Banaao, Code Auto-Fill Ho Jaata Hai
+
+Jab bhi `nvim NewFile.java` karo ya NvimTree se naya file banaao — boilerplate auto-fill ho jaata hai!
+
+### Java — Smart Package Detection
+
+```bash
+nvim src/main/java/com/example/MyService.java
+```
+Auto-fill:
+```java
+package com.example;
+
+public class MyService {
+
+    public MyService() {
+        // constructor
+    }
+
+}
+```
+Package directory structure se auto-detect hoti hai.
+
+### Supported Templates
+
+| File | Auto-Insert |
+|------|------------|
+| `*.java` | package declaration + class with constructor |
+| `*Interface.java` | package + interface |
+| `*.py` | shebang + docstring + main() |
+| `*.tsx` | React component with Props interface |
+| `*.jsx` | React functional component |
+| `*.html` | HTML5 boilerplate |
+| `*.css` | Reset + variables + structure |
+| `*.go` | package + imports (main.go mein main func) |
+| `*.rs` | main.rs mein main(), baaki files mein struct+impl |
+| `*.c` / `*.cpp` | includes + main() |
+| `*.h` / `*.hpp` | include guards |
+| `*.sh` | shebang + set -euo pipefail + chmod +x |
+| `Makefile` | build/test/clean targets |
+| `Dockerfile` | basic template |
+
+---
+
+## Package Suggestions — Latest Versions
+
+### Rust — Cargo.toml mein
+
+Cursor ko package naam pe rakho:
+
+| Key | Action |
+|-----|--------|
+| `Space+co` | Package versions dikhao |
+| `Space+cu` | Saare packages upgrade karo |
+| `Space+cf` | Package features dikhao |
+| Type `serde` in Cargo.toml | Auto-complete latest version |
+
+### NPM — package.json mein
+
+| Key | Action |
+|-----|--------|
+| `Space+ns` | Saare packages ki versions dikhao |
+| `Space+nu` | Package update karo |
+| `Space+ni` | Nayi package install karo |
+| Type package name | Auto-complete from npm registry |
+
+---
+
+## Supported Languages (LSP)
+
+| Language | LSP Server | Auto-install |
+|----------|-----------|--------------|
+| Java | `jdtls` (Eclipse JDT) | ✅ Mason |
+| Kotlin | `kotlin_language_server` | ✅ Mason |
+| Python | `pyright` | ✅ Mason |
+| TypeScript/JS | `ts_ls` | ✅ Mason |
+| Rust | `rust_analyzer` | ✅ Mason |
+| Go | `gopls` | ✅ Mason |
+| C/C++ | `clangd` | ✅ Mason |
+| HTML | `html` | ✅ Mason |
+| CSS/SCSS | `cssls` | ✅ Mason |
+| Tailwind | `tailwindcss` | ✅ Mason |
+| PHP | `phpactor` | ✅ Mason |
+| Ruby | `solargraph` | ✅ Mason |
+| YAML | `yamlls` | ✅ Mason |
+| Dockerfile | `dockerls` | ✅ Mason |
+| Bash | `bashls` | ✅ Mason |
+| Lua | `lua_ls` | ✅ Mason |
+
+`:Mason` command se aur servers install kar sakte ho.
+
+---
+
 ## Kya Linux/Mac/Windows pe kaam karta hai
 
 | Feature | Linux | Mac | WSL | Windows Native | SSH |

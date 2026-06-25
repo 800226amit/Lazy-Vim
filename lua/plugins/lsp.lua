@@ -27,19 +27,26 @@ return {
         }
       })
 
-      -- Servers to install
+      -- Servers to install (Mason auto-install karega)
       local servers = {
         "lua_ls",          -- Lua
         "ts_ls",           -- TypeScript/JavaScript
         "html",            -- HTML
         "cssls",           -- CSS
-        "tailwindcss",     -- Tailwind
+        "tailwindcss",     -- Tailwind CSS
         "jsonls",          -- JSON
         "pyright",         -- Python
         "rust_analyzer",   -- Rust
         "gopls",           -- Go
         "clangd",          -- C/C++
         "bashls",          -- Bash
+        "jdtls",           -- Java (Eclipse JDT)
+        "kotlin_language_server", -- Kotlin
+        "phpactor",        -- PHP
+        "solargraph",      -- Ruby
+        "yamlls",          -- YAML
+        "dockerls",        -- Dockerfile
+        "docker_compose_language_service", -- Docker Compose
       }
 
       require("mason-lspconfig").setup({
@@ -96,11 +103,40 @@ return {
         },
       })
 
+      -- Java: jdtls ke liye special config (project root detect karta hai)
+      vim.lsp.config("jdtls", {
+        capabilities = capabilities,
+        root_dir = vim.fs.root(0, {
+          "pom.xml", "build.gradle", "build.gradle.kts", ".git", "mvnw", "gradlew",
+        }),
+        settings = {
+          java = {
+            eclipse = { downloadSources = true },
+            configuration = { updateBuildConfiguration = "interactive" },
+            maven = { downloadSources = true },
+            implementationsCodeLens = { enabled = true },
+            referencesCodeLens = { enabled = true },
+            format = { enabled = true },
+            signatureHelp = { enabled = true },
+            completion = {
+              favoriteStaticMembers = {
+                "org.junit.Assert.*", "org.junit.Assume.*",
+                "org.junit.jupiter.api.Assertions.*",
+                "java.util.Objects.requireNonNull",
+                "java.util.Objects.requireNonNullElse",
+              },
+            },
+          },
+        },
+      })
+
       -- All other servers with default capabilities
       local all_servers = {
         "ts_ls", "pyright",
         "html", "cssls", "tailwindcss", "jsonls",
         "rust_analyzer", "gopls", "clangd", "bashls",
+        "kotlin_language_server", "phpactor", "solargraph",
+        "yamlls", "dockerls", "docker_compose_language_service",
       }
       for _, server in ipairs(all_servers) do
         vim.lsp.config(server, { capabilities = capabilities })
