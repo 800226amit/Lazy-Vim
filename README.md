@@ -457,24 +457,26 @@ Function/class tree keyboard se navigate karo.
 
 Codeium ek free AI hai jo sabhi languages mein code suggest karta hai — GitHub Copilot jaisa but bilkul free.
 
-### Pehli baar setup (ek baar karna hai)
+### Pehli baar setup (sirf ek baar)
+
+Neovim kholo aur yeh command chalao:
 ```
 :Codeium Auth
 ```
-Browser mein Google/GitHub account se login karo. Bas.
+Browser khulega → Google ya GitHub se login karo → ho gaya. Ab hamesha ke liye kaam karega.
 
 ### AI ke shortcuts (Insert mode mein)
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+G` | AI suggestion **accept** karo (puri) |
-| `Ctrl+W` | Ek word accept karo |
-| `Ctrl+L` | Ek line accept karo |
-| `Ctrl+N` | Next suggestion dikhao |
-| `Ctrl+P` | Previous suggestion dikhao |
-| `Ctrl+X` | Suggestion dismiss karo |
+| `Ctrl+G` | AI suggestion **puri accept** karo |
+| `Alt+W` | Ek word accept karo |
+| `Alt+L` | Ek line accept karo |
+| `Alt+.` | Next suggestion |
+| `Alt+,` | Previous suggestion |
+| `Alt+X` | Suggestion hatao (dismiss) |
 
-> Ghost text (gray color) dikhta hai — `Ctrl+G` se accept karo.
+> Gray color mein ghost text dikhta hai — `Ctrl+G` se accept karo.
 
 ---
 
