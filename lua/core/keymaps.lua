@@ -4,6 +4,13 @@
 
 local map = vim.keymap.set
 
+-- Full VS Code / Windows-like editing behavior: Ctrl+A selects all in every
+-- mode, Shift+Arrow/Home/End start & extend a selection, typing over a
+-- selection replaces it, Backspace/Delete removes it, Ctrl+C/X/V/Z/Y work
+-- everywhere. Anything we want to behave differently is remapped below,
+-- which wins since it's declared after this.
+vim.cmd("source " .. vim.env.VIMRUNTIME .. "/scripts/mswin.vim")
+
 -- Better save/quit
 map("n", "<C-s>", ":w<CR>", { desc = "Save file" })
 map("i", "<C-s>", "<Esc>:w<CR>a", { desc = "Save file" })
@@ -69,20 +76,15 @@ map("v", "<S-Tab>", "<gv", { desc = "Indent left" })
 -- Better paste (visual mode - paste without overwriting clipboard)
 map("v", "p", '"_dP', { desc = "Paste without yanking" })
 
--- VS Code-like copy/cut/paste
+-- VS Code-like copy/cut (paste, select-all, undo/redo come from mswin.vim above)
 map("v", "<C-c>", '"+y',  { desc = "Copy to system clipboard" })
 map("v", "<C-x>", '"+d',  { desc = "Cut to system clipboard" })
-map("n", "<C-v>", '"+p',  { desc = "Paste from system clipboard" })
-map("i", "<C-v>", "<C-r>+", { desc = "Paste from system clipboard" })
 
--- Select all
-map("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
-
--- Undo/Redo (normal + insert mode)
-map("n", "<C-z>", "u",        { desc = "Undo" })
-map("i", "<C-z>", "<C-o>u",   { desc = "Undo" })
-map("n", "<C-y>", "<C-r>",    { desc = "Redo" })
-map("i", "<C-y>", "<C-o><C-r>", { desc = "Redo" })
+-- Delete selection with Backspace/Delete without clobbering the yank/clipboard
+-- register (mswin.vim's own <BS> mapping uses "d", which would silently
+-- overwrite whatever you last copied to the system clipboard)
+map("v", "<BS>", '"_d', { desc = "Delete selection" })
+map("v", "<Del>", '"_d', { desc = "Delete selection" })
 
 -- File explorer
 map("n", "<leader>e",  ":NvimTreeToggle<CR>",   { desc = "Toggle file explorer" })
